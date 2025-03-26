@@ -20,12 +20,12 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Import OpenAPI Specs to Postman
+      - name: Import Swagger Files to Postman
         env:
           POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
           POSTMAN_WORKSPACE: ${{ secrets.POSTMAN_WORKSPACE }}
         run: |
-          # Define an array of your swagger file names
+          # Define an array of swagger file names (adjust the path if necessary)
           files=(
             gateway-swagger.yml
             dashboard-swagger.yml
@@ -36,23 +36,20 @@ jobs:
           
           for file in "${files[@]}"; do
             echo "Processing $file..."
-            # Read and convert file contents to a JSON-escaped string
+            # Read and convert the file to a JSON string
             input=$(cat "tyk-docs/assets/others/$file" | jq -Rs '.')
           
-            # Build the JSON payload
-            payload=$(jq -n --arg input "$input" '{ type: "string", input: $input }')
+            # Build the JSON payload with the expected structure
+            payload="{\"type\": \"string\", \"input\": $input}"
           
-            # (Optional) Save payload for inspection
-            echo "$payload" > payload-${file}.json
             echo "Payload for $file:"
-            cat payload-${file}.json
+            echo "$payload"
           
-            # Send the POST request to Postman's import/openapi endpoint with workspace query parameter
-            echo "Sending $file to Postman..."
+            # Send the POST request to Postman's /import/openapi endpoint with the workspace query parameter
             curl --location --request POST "https://api.getpostman.com/import/openapi?workspace=${POSTMAN_WORKSPACE}" \
               --header "X-Api-Key: ${POSTMAN_API_KEY}" \
               --header "Content-Type: application/json" \
-              --data-raw "@payload-${file}.json"
+              --data-raw "$payload"
           
             echo "Done processing $file"
           done
