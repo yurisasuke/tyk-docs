@@ -37,19 +37,12 @@ jobs:
           for file in "${files[@]}"; do
             echo "Processing $file..."
             # Read and convert the file to a JSON string
-            input=$(cat "tyk-docs/assets/others/$file" | jq -Rs '.')
-          
-            # Build the JSON payload with the expected structure
-            payload="{\"type\": \"string\", \"input\": $input}"
-          
-            echo "Payload for $file:"
-            echo "$payload"
-          
+            input=$(cat "tyk-docs/assets/others/$file" | jq -Rs '.')  
             # Send the POST request to Postman's /import/openapi endpoint with the workspace query parameter
             curl --location --request POST "https://api.getpostman.com/import/openapi?workspace=${POSTMAN_WORKSPACE}" \
               --header "X-Api-Key: ${POSTMAN_API_KEY}" \
               --header "Content-Type: application/json" \
-              --data-raw "$payload"
+              --data-raw "{\"type\": \"string\", \"input\": $input}"
           
             echo "Done processing $file"
           done
