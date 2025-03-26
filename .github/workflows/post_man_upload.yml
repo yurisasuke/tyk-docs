@@ -1,4 +1,4 @@
-name: Import Swagger to Postman
+name: Import Swagger to Postman using HTTPie
 
 on:
   workflow_dispatch:
@@ -16,32 +16,42 @@ jobs:
         with:
           ref: ${{ github.event.inputs.next_latest_branch }}
 
-      - name: Install jq
+      - name: Install Dependencies
         run: |
-          sudo apt-get update && sudo apt-get install -y jq
+          sudo apt-get update
+          sudo apt-get install -y jq httpie
 
       - name: Import Swagger Files to Postman
         env:
           POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
           POSTMAN_WORKSPACE: ${{ secrets.POSTMAN_WORKSPACE }}
         run: |
-          # Define an array of swagger file names (adjust the path if necessary)
+          # Define an array of your swagger file names (adjust the path as needed)
           files=(
-            gateway-swagger.yml
-            dashboard-swagger.yml
-            mdcb-swagger.yml
-            enterprise-developer-portal-swagger.yaml
-            dashboard-admin-swagger.yml
+            "gateway-swagger.yml"
+            "dashboard-swagger.yml"
+            "mdcb-swagger.yml"
+            "enterprise-developer-portal-swagger.yaml"
+            "dashboard-admin-swagger.yml"
           )
           
           for file in "${files[@]}"; do
             echo "Processing $file..."
-            # Read and convert the file to a JSON string
-            input=$(cat "tyk-docs/assets/others/$file" | jq -Rs '.')  
-            curl --location --request POST "https://api.getpostman.com/import/openapi?workspace=${POSTMAN_WORKSPACE}" \
-              --header "X-Api-Key: ${POSTMAN_API_KEY}" \
-              --header "Content-Type: application/json" \
-              --data-raw "{\"type\": \"string\", \"input\": $input}"
+          
+            # Read and convert file contents to a JSON-escaped string
+            input=$(cat "tyk-docs/assets/others/$file" | jq -Rs '.')
+          
+            # Build the JSON payload with the expected structure
+            payload="{\"type\": \"string\", \"input\": $input}"
+          
+            # Save the payload to a file (using .json extension)
+            echo "$payload" > "payload-${file}.json"
+            echo "Payload for $file saved to payload-${file}.json"
+          
+            # Use HTTPie to send the POST request with the payload file as input
+            http POST "https://api.getpostman.com/import/openapi?workspace=${POSTMAN_WORKSPACE}" \
+              X-Api-Key:${POSTMAN_API_KEY} \
+              Content-Type:application/json < "payload-${file}.json"
           
             echo "Done processing $file"
           done
