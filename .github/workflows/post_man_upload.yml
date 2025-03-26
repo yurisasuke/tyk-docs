@@ -38,7 +38,6 @@ jobs:
             echo "Processing $file..."
             # Read and convert the file to a JSON string
             input=$(cat "tyk-docs/assets/others/$file" | jq -Rs '.')  
-            # Send the POST request to Postman's /import/openapi endpoint with the workspace query parameter
             curl --location --request POST "https://api.getpostman.com/import/openapi?workspace=${POSTMAN_WORKSPACE}" \
               --header "X-Api-Key: ${POSTMAN_API_KEY}" \
               --header "Content-Type: application/json" \
