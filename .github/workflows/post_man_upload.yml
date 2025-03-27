@@ -78,7 +78,7 @@ jobs:
           
             # Build the PATCH payload to update only the collection name.
             update_payload=$(jq -n --arg new_name "$new_name" '{
-              update: {
+              collection: {
                 info: {
                   name: $new_name
                 }
