@@ -151,10 +151,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.ORG_GH_TOKEN}}
         run: |
+          echo ${{ github.event.inputs.should_automerge }}
           echo "should_automerge: ${{ github.event.inputs.should_automerge }}"
-          gh pr review ${{ steps.version-updater.outputs.pull-request-number }} --approve
+          
           gh pr merge ${{ steps.version-updater.outputs.pull-request-number }}  --squash --auto
-          gh pr review ${{ steps.stable-updater.outputs.pull-request-number }} --approve
+        
           gh pr merge ${{ steps.stable-updater.outputs.pull-request-number }}  --squash --auto
-          gh pr review ${{ steps.cpr.outputs.pull-request-number }} --approve
+      
           gh pr merge ${{ steps.cpr.outputs.pull-request-number }}  --squash --auto
