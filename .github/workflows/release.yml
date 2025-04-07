@@ -149,7 +149,7 @@ jobs:
       - name: Auto Merge pull requests created
         if: ${{ github.event.inputs.should_automerge}}
         env:
-          GITHUB_TOKEN: ${{ secrets.TYK_SCRIPTS_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.ORG_GH_TOKEN}}
         run: |
           echo "should_automerge: ${{ github.event.inputs.should_automerge }}"
           gh pr review ${{ steps.version-updater.outputs.pull-request-number }} --approve
