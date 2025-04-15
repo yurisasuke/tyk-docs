@@ -3,12 +3,18 @@ ENV: <b>TYK_GW_HOSTNAME</b><br />
 Type: `string`<br />
 
 Force your Gateway to work only on a specific domain name. Can be overridden by API custom domain.
+Meta:
+*Required
+default: localhost
+min: 5.7.0
+Deprecated: 5.9.0
 
 ### listen_address
 ENV: <b>TYK_GW_LISTENADDRESS</b><br />
 Type: `string`<br />
 
 If your machine has multiple network devices or IPs you can force the Gateway to use the IP address you want.
+	Deprecated: 5.9.0
 
 ### listen_port
 ENV: <b>TYK_GW_LISTENPORT</b><br />
@@ -213,13 +219,16 @@ Enabled WebSockets and server side events support
 ENV: <b>TYK_GW_HTTPSERVEROPTIONS_CERTIFICATES</b><br />
 Type: `CertsData`<br />
 
-Deprecated. SSL certificates used by Gateway server.
+Deprecated: Use `ssl_certificates`instead.
 
 ### http_server_options.ssl_certificates
 ENV: <b>TYK_GW_HTTPSERVEROPTIONS_SSLCERTIFICATES</b><br />
 Type: `[]string`<br />
 
-SSL certificates used by your Gateway server. A list of certificate IDs or path to files.
+Index of certificates available to the Gateway for use in client and upstream communication.
+The string value in the array can be two of the following options:
+1. The ID assigned to and used to identify a certificate in the Tyk Certificate Store
+2. The path to a file accessible to the Gateway. This PEM file must contain the private key and public certificate pair concatenated together.
 
 ### http_server_options.server_name
 ENV: <b>TYK_GW_HTTPSERVEROPTIONS_SERVERNAME</b><br />
