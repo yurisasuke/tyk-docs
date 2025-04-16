@@ -2,12 +2,14 @@
 ENV: <b>TYK_GW_HOSTNAME</b><br />
 Type: `string`<br />
 
+Is required: <b>true</b><br />Example: <b>user@provider.net</b><br />Deprecated in version: <b>5.9.0</b><br />Default: <b>user@provider.net</b><br />Available since: <b>5.1.0</b><br />Allowed values: <b>name,itachi</b><br />
 Force your Gateway to work only on a specific domain name. Can be overridden by API custom domain.
 
 ### listen_address
 ENV: <b>TYK_GW_LISTENADDRESS</b><br />
 Type: `string`<br />
 
+Deprecated in version: <b>5.9.0</b><br />
 If your machine has multiple network devices or IPs you can force the Gateway to use the IP address you want.
 
 ### listen_port
@@ -213,13 +215,17 @@ Enabled WebSockets and server side events support
 ENV: <b>TYK_GW_HTTPSERVEROPTIONS_CERTIFICATES</b><br />
 Type: `CertsData`<br />
 
-Deprecated. SSL certificates used by Gateway server.
+Deprecated in version: <b>Use `ssl_certificates`instead.</b><br />
+
 
 ### http_server_options.ssl_certificates
 ENV: <b>TYK_GW_HTTPSERVEROPTIONS_SSLCERTIFICATES</b><br />
 Type: `[]string`<br />
 
-SSL certificates used by your Gateway server. A list of certificate IDs or path to files.
+Index of certificates available to the Gateway for use in client and upstream communication.
+The string value in the array can be two of the following options:
+1. The ID assigned to and used to identify a certificate in the Tyk Certificate Store
+2. The path to a file accessible to the Gateway. This PEM file must contain the private key and public certificate pair concatenated together.
 
 ### http_server_options.server_name
 ENV: <b>TYK_GW_HTTPSERVEROPTIONS_SERVERNAME</b><br />
@@ -776,10 +782,10 @@ How frequently a distributed rate limiter synchronises information between the G
 ENV: <b>TYK_GW_DRLTHRESHOLD</b><br />
 Type: `float64`<br />
 
+Default: <b>5</b><br />
 A distributed rate limiter is inaccurate on small rate limits, and it will fallback to a Redis or Sentinel rate limiter on an individual user basis, if its rate limiter lower then threshold.
 A Rate limiter threshold calculated using the following formula: `rate_threshold = drl_threshold * number_of_gateways`.
 So you have 2 Gateways, and your threshold is set to 5, if a user rate limit is larger than 10, it will use the distributed rate limiter algorithm.
-Default: 5
 
 ### drl_enable_sentinel_rate_limiter
 ENV: <b>TYK_GW_DRLENABLESENTINELRATELIMITER</b><br />
@@ -963,8 +969,8 @@ Allow list of ciphers for connection between Tyk and your upstream service.
 ENV: <b>TYK_GW_PROXYDEFAULTTIMEOUT</b><br />
 Type: `float64`<br />
 
+Default: <b>30 seconds</b><br />
 This can specify a default timeout in seconds for upstream API requests.
-Default: 30 seconds
 
 ### proxy_ssl_disable_renegotiation
 ENV: <b>TYK_GW_PROXYSSLDISABLERENEGOTIATION</b><br />
@@ -1340,9 +1346,9 @@ Defaults to "1.2".
 ENV: <b>TYK_GW_LIVENESSCHECK_CHECKDURATION</b><br />
 Type: `time.Duration`<br />
 
+Default: <b>10 seconds.</b><br />
 Frequencies of performing interval healthchecks for Redis, Dashboard, and RPC layer.
 Expressed in Nanoseconds. For example: 1000000000 -> 1s.
-Default: 10 seconds.
 
 ### dns_cache
 This section enables the global configuration of the expireable DNS records caching for your Gateway API endpoints.
@@ -1680,10 +1686,10 @@ Enabled controls the generation of access logs by the Gateway. Default: false.
 ENV: <b>TYK_GW_ACCESSLOGS_TEMPLATE</b><br />
 Type: `[]string`<br />
 
+Example: <b>["client_ip", "path"].</b><br />
 Template configures which fields to include in the access log.
 If no template is configured, all available fields will be logged.
 
-Example: ["client_ip", "path"].
 
 Template Options:
 
@@ -1701,8 +1707,8 @@ Template Options:
 - `status` will include the response status code.
 
 ### tracing
+Deprecated in version: <b>use OpenTelemetry instead.</b><br />
 Section for configuring OpenTracing support
-Deprecated: use OpenTelemetry instead.
 
 ### tracing.name
 ENV: <b>TYK_GW_TRACER_NAME</b><br />
@@ -2098,11 +2104,11 @@ KVVersion is the version number of Vault. Usually defaults to 2
 ENV: <b>TYK_GW_SECRETS</b><br />
 Type: `map[string]string`<br />
 
+Example: <b>`TYK_GW_SECRETS=key1:value1,key2:/value2`</b><br />
 Secrets configures a list of key/value pairs for the gateway.
 When configuring it via environment variable, the expected value
 is a comma separated list of key-value pairs delimited with a colon.
 
-Example: `TYK_GW_SECRETS=key1:value1,key2:/value2`
 Produces: `{"key1": "value1", "key2": "/value2"}`
 
 The secret value may be used as `secrets://key1` from the API definition.
